@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.daimao.mapper.FileMetaMapper">
+    <resultMap id="BaseResultMap" type="com.daimao.model.FileMeta">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="is_directory" jdbcType="BOOLEAN" property="directory"/>
+        <result column="pinyin" jdbcType="VARCHAR" property="pinyin"/>
+        <result column="pinyin_first" jdbcType="VARCHAR" property="pinyinFirst"/>
+        <result column="size" jdbcType="BIGINT" property="length"/>
+        <result column="last_modified" jdbcType="TIMESTAMP" property="lastModified"/>
+    </resultMap>
+
+        <select id="query" parameterType="java.lang.String" resultMap="BaseResultMap">
+            select id, name, path, pinyin,pinyin_first,is_directory, size, last_modified
+            from file_meta
+            where name like '%${keyword}%'
+               or pinyin like '%${keyword}%'
+               or pinyin_first like '%${keyword}%'
+        </select>
+
+        <select id="queryByPath" parameterType="java.lang.String" resultMap="BaseResultMap">
+            select id, name, pinyin, pinyin_first, path, is_directory, size, last_modified
+            from file_meta
+            where path like '${path}%'
+        </select>
+
+        <delete id="delete">
+            DELETE FROM file_meta
+            WHERE id IN
+                  <foreach collection="list" item="item" open="(" close=")" separator=",">
+                      ${item}
+                  </foreach>
+        </delete>
+
+    <insert id="save" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+        INSERT INTO file_meta (name,path,is_directory,pinyin,pinyin_first,size,last_modified)
+        values
+        <foreach collection="list" item="fileMeta" index="index" separator=",">
+            (
+            #{fileMeta.name},
+            #{fileMeta.path},
+            #{fileMeta.directory},
+            #{fileMeta.pinyin},
+            #{fileMeta.pinyinFirst},
+            #{fileMeta.length},
+            #{fileMeta.lastModified}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryAll" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select id, name, pinyin, pinyin_first, path, is_directory, size, last_modified
+        from file_meta
+    </select>
+</mapper>
