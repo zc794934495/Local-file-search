@@ -46,14 +46,16 @@ public class AppController implements Initializable {
     private DBService dbService;
 
     @FXML
-    public void choose(MouseEvent mouseEvent) {
+    public void choose(MouseEvent mouseEvent) throws InterruptedException {
         DirectoryChooser chooser = new DirectoryChooser();
         File root = chooser.showDialog(rootPane.getScene().getWindow());
         if (root == null) {
             return;
         }
         dbService.init();
-        fileService.scan(root);
+        Thread thread = new Thread(() -> fileService.scan(root));
+        thread.start();
+        thread.join();
 
         List<FileMeta> fileList = fileService.queryAll();
         Platform.runLater(() ->{
